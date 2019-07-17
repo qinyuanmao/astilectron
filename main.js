@@ -34,10 +34,10 @@ if (process.argv[3] === "true") {
 // Command line switches
 let idx = 4;
 for (let i = idx; i < process.argv.length; i++) {
-    let s = process.argv[i].replace(/^[\-]+/g,"");
+    let s = process.argv[i].replace(/^[\-]+/g, "");
     let v;
-    if (typeof process.argv[i+1] !== "undefined" && !process.argv[i+1].startsWith("-")) {
-        v = process.argv[i+1];
+    if (typeof process.argv[i + 1] !== "undefined" && !process.argv[i + 1].startsWith("-")) {
+        v = process.argv[i + 1];
         i++;
     }
     app.commandLine.appendSwitch(s, v);
@@ -47,20 +47,35 @@ for (let i = idx; i < process.argv.length; i++) {
 app.on('before-quit', () => quittingApp = true);
 
 // App is ready
-app.on('ready',() => {
+app.on('ready', () => {
     // Init
     const screen = electron.screen
     Menu.setApplicationMenu(null)
 
     // Listen to screen events
-    screen.on('display-added', function() {
-        client.write(consts.targetIds.app, consts.eventNames.displayEventAdded, {displays: {all: screen.getAllDisplays(), primary: screen.getPrimaryDisplay()}})
+    screen.on('display-added', function () {
+        client.write(consts.targetIds.app, consts.eventNames.displayEventAdded, {
+            displays: {
+                all: screen.getAllDisplays(),
+                primary: screen.getPrimaryDisplay()
+            }
+        })
     })
-    screen.on('display-metrics-changed', function() {
-        client.write(consts.targetIds.app, consts.eventNames.displayEventMetricsChanged, {displays: {all: screen.getAllDisplays(), primary: screen.getPrimaryDisplay()}})
+    screen.on('display-metrics-changed', function () {
+        client.write(consts.targetIds.app, consts.eventNames.displayEventMetricsChanged, {
+            displays: {
+                all: screen.getAllDisplays(),
+                primary: screen.getPrimaryDisplay()
+            }
+        })
     })
-    screen.on('display-removed', function() {
-        client.write(consts.targetIds.app, consts.eventNames.displayEventRemoved, {displays: {all: screen.getAllDisplays(), primary: screen.getPrimaryDisplay()}})
+    screen.on('display-removed', function () {
+        client.write(consts.targetIds.app, consts.eventNames.displayEventRemoved, {
+            displays: {
+                all: screen.getAllDisplays(),
+                primary: screen.getPrimaryDisplay()
+            }
+        })
     })
 
     // Listen on main ipcMain
@@ -76,7 +91,7 @@ app.on('ready',() => {
     });
 
     // Read from client
-    rl.on('line', function(line){
+    rl.on('line', function (line) {
         // Parse the JSON
         let json = JSON.parse(line)
 
@@ -85,215 +100,215 @@ app.on('ready',() => {
         switch (json.name) {
             // App
             case consts.eventNames.appCmdQuit:
-            app.quit();
-            break;
+                app.quit();
+                break;
 
             // Dock
             case consts.eventNames.dockCmdBounce:
-            let id = 0;
-            if (typeof app.dock !== "undefined") {
-                id = app.dock.bounce(json.bounceType);
-            }
-            client.write(consts.targetIds.dock, consts.eventNames.dockEventBouncing, {id: id});
-            break;
+                let id = 0;
+                if (typeof app.dock !== "undefined") {
+                    id = app.dock.bounce(json.bounceType);
+                }
+                client.write(consts.targetIds.dock, consts.eventNames.dockEventBouncing, {id: id});
+                break;
             case consts.eventNames.dockCmdBounceDownloads:
-            if (typeof app.dock !== "undefined") {
-                app.dock.downloadFinished(json.filePath);
-            }
-            client.write(consts.targetIds.dock, consts.eventNames.dockEventDownloadsBouncing);
-            break;
+                if (typeof app.dock !== "undefined") {
+                    app.dock.downloadFinished(json.filePath);
+                }
+                client.write(consts.targetIds.dock, consts.eventNames.dockEventDownloadsBouncing);
+                break;
             case consts.eventNames.dockCmdCancelBounce:
-            if (typeof app.dock !== "undefined") {
-                app.dock.cancelBounce(json.id);
-            }
-            client.write(consts.targetIds.dock, consts.eventNames.dockEventBouncingCancelled);
-            break;
+                if (typeof app.dock !== "undefined") {
+                    app.dock.cancelBounce(json.id);
+                }
+                client.write(consts.targetIds.dock, consts.eventNames.dockEventBouncingCancelled);
+                break;
             case consts.eventNames.dockCmdHide:
-            if (typeof app.dock !== "undefined") {
-                app.dock.hide();
-            }
-            client.write(consts.targetIds.dock, consts.eventNames.dockEventHidden);
-            break;
+                if (typeof app.dock !== "undefined") {
+                    app.dock.hide();
+                }
+                client.write(consts.targetIds.dock, consts.eventNames.dockEventHidden);
+                break;
             case consts.eventNames.dockCmdSetBadge:
-            if (typeof app.dock !== "undefined") {
-                app.dock.setBadge(json.badge);
-            }
-            client.write(consts.targetIds.dock, consts.eventNames.dockEventBadgeSet);
-            break;
+                if (typeof app.dock !== "undefined") {
+                    app.dock.setBadge(json.badge);
+                }
+                client.write(consts.targetIds.dock, consts.eventNames.dockEventBadgeSet);
+                break;
             case consts.eventNames.dockCmdSetIcon:
-            if (typeof app.dock !== "undefined") {
-                app.dock.setIcon(json.image);
-            }
-            client.write(consts.targetIds.dock, consts.eventNames.dockEventIconSet);
-            break;
+                if (typeof app.dock !== "undefined") {
+                    app.dock.setIcon(json.image);
+                }
+                client.write(consts.targetIds.dock, consts.eventNames.dockEventIconSet);
+                break;
             case consts.eventNames.dockCmdShow:
-            if (typeof app.dock !== "undefined") {
-                app.dock.show();
-            }
-            client.write(consts.targetIds.dock, consts.eventNames.dockEventShown);
-            break;
+                if (typeof app.dock !== "undefined") {
+                    app.dock.show();
+                }
+                client.write(consts.targetIds.dock, consts.eventNames.dockEventShown);
+                break;
 
             // Menu
             case consts.eventNames.menuCmdCreate:
-            menuCreate(json.menu)
-            menus[json.menu.rootId] = json.targetID
-            setMenu(json.menu.rootId)
-            client.write(json.targetID, consts.eventNames.menuEventCreated)
-            break;
-            case consts.eventNames.menuCmdDestroy:
-            elements[json.targetID] = null
-            if (menus[json.menu.rootId] === json.targetID) {
-                menus[json.menu.rootId] = null
+                menuCreate(json.menu)
+                menus[json.menu.rootId] = json.targetID
                 setMenu(json.menu.rootId)
-            }
-            client.write(json.targetID, consts.eventNames.menuEventDestroyed)
-            break;
+                client.write(json.targetID, consts.eventNames.menuEventCreated)
+                break;
+            case consts.eventNames.menuCmdDestroy:
+                elements[json.targetID] = null
+                if (menus[json.menu.rootId] === json.targetID) {
+                    menus[json.menu.rootId] = null
+                    setMenu(json.menu.rootId)
+                }
+                client.write(json.targetID, consts.eventNames.menuEventDestroyed)
+                break;
 
             // Menu item
             case consts.eventNames.menuItemCmdSetChecked:
-            elements[json.targetID].checked = json.menuItemOptions.checked
-            client.write(json.targetID, consts.eventNames.menuItemEventCheckedSet)
-            break;
+                elements[json.targetID].checked = json.menuItemOptions.checked
+                client.write(json.targetID, consts.eventNames.menuItemEventCheckedSet)
+                break;
             case consts.eventNames.menuItemCmdSetEnabled:
-            elements[json.targetID].enabled = json.menuItemOptions.enabled
-            client.write(json.targetID, consts.eventNames.menuItemEventEnabledSet)
-            break;
+                elements[json.targetID].enabled = json.menuItemOptions.enabled
+                client.write(json.targetID, consts.eventNames.menuItemEventEnabledSet)
+                break;
             case consts.eventNames.menuItemCmdSetLabel:
-            elements[json.targetID].label = json.menuItemOptions.label
-            client.write(json.targetID, consts.eventNames.menuItemEventLabelSet)
-            break;
+                elements[json.targetID].label = json.menuItemOptions.label
+                client.write(json.targetID, consts.eventNames.menuItemEventLabelSet)
+                break;
             case consts.eventNames.menuItemCmdSetVisible:
-            elements[json.targetID].visible = json.menuItemOptions.visible
-            client.write(json.targetID, consts.eventNames.menuItemEventVisibleSet)
-            break;
+                elements[json.targetID].visible = json.menuItemOptions.visible
+                client.write(json.targetID, consts.eventNames.menuItemEventVisibleSet)
+                break;
 
             // Notification
             case consts.eventNames.notificationCmdCreate:
-            notificationCreate(json);
-            break;
+                notificationCreate(json);
+                break;
             case consts.eventNames.notificationCmdShow:
-            if (Notification.isSupported()) {
-                elements[json.targetID].show();
-            }
-            break;
+                if (Notification.isSupported()) {
+                    elements[json.targetID].show();
+                }
+                break;
 
             // Session
             case consts.eventNames.sessionCmdClearCache:
-            elements[json.targetID].clearCache(function() {
-                client.write(json.targetID, consts.eventNames.sessionEventClearedCache)
-            })
-            break;
+                elements[json.targetID].clearCache(function () {
+                    client.write(json.targetID, consts.eventNames.sessionEventClearedCache)
+                })
+                break;
 
             // Sub menu
             case consts.eventNames.subMenuCmdAppend:
-            elements[json.targetID].append(menuItemCreate(json.menuItem))
-            setMenu(json.menuItem.rootId)
-            client.write(json.targetID, consts.eventNames.subMenuEventAppended)
-            break;
+                elements[json.targetID].append(menuItemCreate(json.menuItem))
+                setMenu(json.menuItem.rootId)
+                client.write(json.targetID, consts.eventNames.subMenuEventAppended)
+                break;
             case consts.eventNames.subMenuCmdClosePopup:
-            window = null
-            if (typeof json.windowId !== "undefined") {
-                window = elements[json.windowId]
-            }
-            elements[json.targetID].closePopup(window)
-            client.write(json.targetID, consts.eventNames.subMenuEventClosedPopup)
-            break;
+                window = null
+                if (typeof json.windowId !== "undefined") {
+                    window = elements[json.windowId]
+                }
+                elements[json.targetID].closePopup(window)
+                client.write(json.targetID, consts.eventNames.subMenuEventClosedPopup)
+                break;
             case consts.eventNames.subMenuCmdInsert:
-            elements[json.targetID].insert(json.menuItemPosition, menuItemCreate(json.menuItem))
-            setMenu(json.menuItem.rootId)
-            client.write(json.targetID, consts.eventNames.subMenuEventInserted)
-            break;
+                elements[json.targetID].insert(json.menuItemPosition, menuItemCreate(json.menuItem))
+                setMenu(json.menuItem.rootId)
+                client.write(json.targetID, consts.eventNames.subMenuEventInserted)
+                break;
             case consts.eventNames.subMenuCmdPopup:
-            window = null
-            if (typeof json.windowId !== "undefined") {
-                window = elements[json.windowId]
-            }
-            json.menuPopupOptions.async = true
-            elements[json.targetID].popup(window, json.menuPopupOptions)
-            client.write(json.targetID, consts.eventNames.subMenuEventPoppedUp)
-            break;
+                window = null
+                if (typeof json.windowId !== "undefined") {
+                    window = elements[json.windowId]
+                }
+                json.menuPopupOptions.async = true
+                elements[json.targetID].popup(window, json.menuPopupOptions)
+                client.write(json.targetID, consts.eventNames.subMenuEventPoppedUp)
+                break;
 
             // Tray
             case consts.eventNames.trayCmdCreate:
-            trayCreate(json)
-            break;
+                trayCreate(json)
+                break;
             case consts.eventNames.trayCmdDestroy:
-            elements[json.targetID].destroy()
-            elements[json.targetID] = null
-            client.write(json.targetID, consts.eventNames.trayEventDestroyed)
-            break;
+                elements[json.targetID].destroy()
+                elements[json.targetID] = null
+                client.write(json.targetID, consts.eventNames.trayEventDestroyed)
+                break;
             case consts.eventNames.trayCmdSetImage:
-            elements[json.targetID].setImage(json.image);
-            client.write(json.targetID, consts.eventNames.trayEventImageSet)
-            break;
+                elements[json.targetID].setImage(json.image);
+                client.write(json.targetID, consts.eventNames.trayEventImageSet)
+                break;
 
             // Web contents
             case consts.eventNames.webContentsEventLoginCallback:
-            executeCallback(consts.callbackNames.webContentsLogin, json, [json.username, json.password]);
-            break;
+                executeCallback(consts.callbackNames.webContentsLogin, json, [json.username, json.password]);
+                break;
 
             // Window
             case consts.eventNames.windowCmdBlur:
-            elements[json.targetID].blur()
-            break;
+                elements[json.targetID].blur()
+                break;
             case consts.eventNames.windowCmdCenter:
-            elements[json.targetID].center()
-            break;
+                elements[json.targetID].center()
+                break;
             case consts.eventNames.windowCmdClose:
-            elements[json.targetID].close()
-            break;
+                elements[json.targetID].close()
+                break;
             case consts.eventNames.windowCmdCreate:
-            windowCreate(json)
-            break;
+                windowCreate(json)
+                break;
             case consts.eventNames.windowCmdDestroy:
-            elements[json.targetID].destroy()
-            elements[json.targetID] = null
-            break;
+                elements[json.targetID].destroy()
+                elements[json.targetID] = null
+                break;
             case consts.eventNames.windowCmdFocus:
-            elements[json.targetID].focus()
-            break;
+                elements[json.targetID].focus()
+                break;
             case consts.eventNames.windowCmdHide:
-            elements[json.targetID].hide()
-            break;
+                elements[json.targetID].hide()
+                break;
             case consts.eventNames.windowCmdLog:
-            elements[json.targetID].webContents.send(consts.eventNames.ipcCmdLog, json.message)
-            break;
+                elements[json.targetID].webContents.send(consts.eventNames.ipcCmdLog, json.message)
+                break;
             case consts.eventNames.windowCmdMaximize:
-            elements[json.targetID].maximize()
-            break;
+                elements[json.targetID].maximize()
+                break;
             case consts.eventNames.windowCmdMessage:
             case consts.eventNames.windowCmdMessageCallback:
-            let m = {message: json.message}
-            if (typeof json.callbackId !== "undefined") m.callbackId = json.callbackId
-            elements[json.targetID].webContents.send(json.name === consts.eventNames.windowCmdMessageCallback ? consts.eventNames.ipcCmdMessageCallback : consts.eventNames.ipcCmdMessage, m)
-            break;
+                let m = {message: json.message}
+                if (typeof json.callbackId !== "undefined") m.callbackId = json.callbackId
+                elements[json.targetID].webContents.send(json.name === consts.eventNames.windowCmdMessageCallback ? consts.eventNames.ipcCmdMessageCallback : consts.eventNames.ipcCmdMessage, m)
+                break;
             case consts.eventNames.windowCmdMinimize:
-            elements[json.targetID].minimize()
-            break;
+                elements[json.targetID].minimize()
+                break;
             case consts.eventNames.windowCmdMove:
-            elements[json.targetID].setPosition(json.windowOptions.x, json.windowOptions.y, true)
-            break;
+                elements[json.targetID].setPosition(json.windowOptions.x, json.windowOptions.y, true)
+                break;
             case consts.eventNames.windowCmdResize:
-            elements[json.targetID].setSize(json.windowOptions.width, json.windowOptions.height, true)
-            break;
+                elements[json.targetID].setSize(json.windowOptions.width, json.windowOptions.height, true)
+                break;
             case consts.eventNames.windowCmdSetBounds:
-            elements[json.targetID].setBounds(json.bounds, true);
-            break;
+                elements[json.targetID].setBounds(json.bounds, true);
+                break;
             case consts.eventNames.windowCmdRestore:
-            elements[json.targetID].restore()
-            break;
+                elements[json.targetID].restore()
+                break;
             case consts.eventNames.windowCmdShow:
-            elements[json.targetID].show()
-            break;
+                elements[json.targetID].show()
+                break;
             case consts.eventNames.windowCmdWebContentsCloseDevTools:
-            elements[json.targetID].webContents.closeDevTools()
-            break;
+                elements[json.targetID].webContents.closeDevTools()
+                break;
             case consts.eventNames.windowCmdWebContentsOpenDevTools:
-            elements[json.targetID].webContents.openDevTools()
-            break;
+                elements[json.targetID].webContents.openDevTools()
+                break;
             case consts.eventNames.windowCmdUnmaximize:
-            elements[json.targetID].unmaximize()
-            break;
+                elements[json.targetID].unmaximize()
+                break;
         }
     });
 
@@ -313,7 +328,7 @@ app.on('ready',() => {
 function menuCreate(menu) {
     if (typeof menu !== "undefined") {
         elements[menu.id] = new Menu()
-        for(let i = 0; i < menu.items.length; i++) {
+        for (let i = 0; i < menu.items.length; i++) {
             elements[menu.id].append(menuItemCreate(menu.items[i]))
         }
         return elements[menu.id]
@@ -324,7 +339,7 @@ function menuCreate(menu) {
 // menuItemCreate creates a menu item
 function menuItemCreate(menuItem) {
     const itemId = menuItem.id
-    menuItem.options.click = function(menuItem) {
+    menuItem.options.click = function (menuItem) {
         client.write(itemId, consts.eventNames.menuItemEventClicked, {menuItemOptions: menuItemToJSON(menuItem)})
     }
     if (typeof menuItem.submenu !== "undefined") {
@@ -366,11 +381,21 @@ function setMenu(rootId) {
 function notificationCreate(json) {
     if (Notification.isSupported()) {
         elements[json.targetID] = new Notification(json.notificationOptions);
-        elements[json.targetID].on('action', (event, index) => { client.write(json.targetID, consts.eventNames.notificationEventActioned, {index: index}) })
-        elements[json.targetID].on('click', () => { client.write(json.targetID, consts.eventNames.notificationEventClicked) })
-        elements[json.targetID].on('close', () => { client.write(json.targetID, consts.eventNames.notificationEventClosed) })
-        elements[json.targetID].on('reply', (event, reply) => { client.write(json.targetID, consts.eventNames.notificationEventReplied, {reply: reply}) })
-        elements[json.targetID].on('show', () => { client.write(json.targetID, consts.eventNames.notificationEventShown) })
+        elements[json.targetID].on('action', (event, index) => {
+            client.write(json.targetID, consts.eventNames.notificationEventActioned, {index: index})
+        })
+        elements[json.targetID].on('click', () => {
+            client.write(json.targetID, consts.eventNames.notificationEventClicked)
+        })
+        elements[json.targetID].on('close', () => {
+            client.write(json.targetID, consts.eventNames.notificationEventClosed)
+        })
+        elements[json.targetID].on('reply', (event, reply) => {
+            client.write(json.targetID, consts.eventNames.notificationEventReplied, {reply: reply})
+        })
+        elements[json.targetID].on('show', () => {
+            client.write(json.targetID, consts.eventNames.notificationEventShown)
+        })
     }
     client.write(json.targetID, consts.eventNames.notificationEventCreated)
 }
@@ -381,9 +406,36 @@ function trayCreate(json) {
     if (typeof json.trayOptions.tooltip !== "undefined") {
         elements[json.targetID].setToolTip(json.trayOptions.tooltip);
     }
-    elements[json.targetID].on('click', (index, event) => { client.write(json.targetID, consts.eventNames.trayEventClicked, {"bounds":{x:event.x, y:event.y,width:event.width,height:event.height}})})
-    elements[json.targetID].on('double-click', (index, event) => { client.write(json.targetID, consts.eventNames.trayEventDoubleClicked, {"bounds":{x:event.x, y:event.y,width:event.width,height:event.height}})})
-    elements[json.targetID].on('right-click', (index, event) => { client.write(json.targetID, consts.eventNames.trayEventRightClicked, {"bounds":{x:event.x, y:event.y,width:event.width,height:event.height}})})
+    elements[json.targetID].on('click', (index, event) => {
+        client.write(json.targetID, consts.eventNames.trayEventClicked, {
+            "bounds": {
+                x: event.x,
+                y: event.y,
+                width: event.width,
+                height: event.height
+            }
+        })
+    })
+    elements[json.targetID].on('double-click', (index, event) => {
+        client.write(json.targetID, consts.eventNames.trayEventDoubleClicked, {
+            "bounds": {
+                x: event.x,
+                y: event.y,
+                width: event.width,
+                height: event.height
+            }
+        })
+    })
+    elements[json.targetID].on('right-click', (index, event) => {
+        client.write(json.targetID, consts.eventNames.trayEventRightClicked, {
+            "bounds": {
+                x: event.x,
+                y: event.y,
+                width: event.width,
+                height: event.height
+            }
+        })
+    })
     client.write(json.targetID, consts.eventNames.trayEventCreated)
 }
 
@@ -391,7 +443,7 @@ function trayCreate(json) {
 function windowCreate(json) {
     elements[json.targetID] = new BrowserWindow(json.windowOptions)
     if (typeof json.windowOptions.proxy !== "undefined") {
-        elements[json.targetID].webContents.session.setProxy(json.windowOptions.proxy, function() {
+        elements[json.targetID].webContents.session.setProxy(json.windowOptions.proxy, function () {
             windowCreateFinish(json)
         })
     } else {
@@ -402,8 +454,10 @@ function windowCreate(json) {
 // windowCreateFinish finishes creating a new window
 function windowCreateFinish(json) {
     elements[json.targetID].setMenu(null)
-    elements[json.targetID].loadURL(json.url, (typeof json.windowOptions.load !== "undefined" ? json.windowOptions.load :  {}));
-    elements[json.targetID].on('blur', () => { client.write(json.targetID, consts.eventNames.windowEventBlur) })
+    elements[json.targetID].loadURL(json.url, (typeof json.windowOptions.load !== "undefined" ? json.windowOptions.load : {}));
+    elements[json.targetID].on('blur', () => {
+        client.write(json.targetID, consts.eventNames.windowEventBlur)
+    })
     elements[json.targetID].on('close', (e) => {
         if (typeof json.windowOptions.custom !== "undefined") {
             if (typeof json.windowOptions.custom.messageBoxOnClose !== "undefined") {
@@ -428,17 +482,39 @@ function windowCreateFinish(json) {
         client.write(json.targetID, consts.eventNames.windowEventClosed)
         delete elements[json.targetID]
     })
-    elements[json.targetID].on('focus', () => { client.write(json.targetID, consts.eventNames.windowEventFocus) })
-    elements[json.targetID].on('hide', () => { client.write(json.targetID, consts.eventNames.windowEventHide) })
-    elements[json.targetID].on('maximize', () => { client.write(json.targetID, consts.eventNames.windowEventMaximize) })
-    elements[json.targetID].on('minimize', () => { client.write(json.targetID, consts.eventNames.windowEventMinimize) })
-    elements[json.targetID].on('move', () => { client.write(json.targetID, consts.eventNames.windowEventMove) })
-    elements[json.targetID].on('ready-to-show', () => { client.write(json.targetID, consts.eventNames.windowEventReadyToShow) })
-    elements[json.targetID].on('resize', () => { client.write(json.targetID, consts.eventNames.windowEventResize) })
-    elements[json.targetID].on('restore', () => { client.write(json.targetID, consts.eventNames.windowEventRestore) })
-    elements[json.targetID].on('show', () => { client.write(json.targetID, consts.eventNames.windowEventShow) })
-    elements[json.targetID].on('unmaximize', () => { client.write(json.targetID, consts.eventNames.windowEventUnmaximize) })
-    elements[json.targetID].on('unresponsive', () => { client.write(json.targetID, consts.eventNames.windowEventUnresponsive) })
+    elements[json.targetID].on('focus', () => {
+        client.write(json.targetID, consts.eventNames.windowEventFocus)
+    })
+    elements[json.targetID].on('hide', () => {
+        client.write(json.targetID, consts.eventNames.windowEventHide)
+    })
+    elements[json.targetID].on('maximize', () => {
+        client.write(json.targetID, consts.eventNames.windowEventMaximize)
+    })
+    elements[json.targetID].on('minimize', () => {
+        client.write(json.targetID, consts.eventNames.windowEventMinimize)
+    })
+    elements[json.targetID].on('move', () => {
+        client.write(json.targetID, consts.eventNames.windowEventMove)
+    })
+    elements[json.targetID].on('ready-to-show', () => {
+        client.write(json.targetID, consts.eventNames.windowEventReadyToShow)
+    })
+    elements[json.targetID].on('resize', () => {
+        client.write(json.targetID, consts.eventNames.windowEventResize)
+    })
+    elements[json.targetID].on('restore', () => {
+        client.write(json.targetID, consts.eventNames.windowEventRestore)
+    })
+    elements[json.targetID].on('show', () => {
+        client.write(json.targetID, consts.eventNames.windowEventShow)
+    })
+    elements[json.targetID].on('unmaximize', () => {
+        client.write(json.targetID, consts.eventNames.windowEventUnmaximize)
+    })
+    elements[json.targetID].on('unresponsive', () => {
+        client.write(json.targetID, consts.eventNames.windowEventUnresponsive)
+    })
     elements[json.targetID].webContents.on('did-finish-load', () => {
         elements[json.targetID].webContents.executeJavaScript(
             `const {ipcRenderer} = require('electron')
@@ -449,12 +525,12 @@ function windowCreateFinish(json) {
                     if (astilectron.onMessageOnce) {
                         return
                     }
-                    ipcRenderer.on('`+ consts.eventNames.ipcCmdMessage +`', function(event, message) {
+                    ipcRenderer.on('` + consts.eventNames.ipcCmdMessage + `', function(event, message) {
                         let v = callback(message.message)
                         if (typeof message.callbackId !== "undefined") {
-                            let e = {callbackId: message.callbackId, targetID: '`+ json.targetID +`'}
+                            let e = {callbackId: message.callbackId, targetID: '` + json.targetID + `'}
                             if (typeof v !== "undefined") e.message = v
-                            ipcRenderer.send('`+ consts.eventNames.ipcEventMessageCallback +`', e)
+                            ipcRenderer.send('` + consts.eventNames.ipcEventMessageCallback + `', e)
                         }
                     })
                     astilectron.onMessageOnce = true
@@ -462,7 +538,7 @@ function windowCreateFinish(json) {
                 callbacks: {},
                 counters: {},
                 registerCallback: function(k, e, c, n) {
-                    e.targetID = '`+ json.targetID +`';
+                    e.targetID = '` + json.targetID + `';
                     if (typeof c !== "undefined") {
                         if (typeof astilectron.counters[k] === "undefined") {
                             astilectron.counters[k] = 1;
@@ -481,7 +557,7 @@ function windowCreateFinish(json) {
                     }
                 },
                 sendMessage: function(message, callback) {
-                    astilectron.registerCallback('` + consts.callbackNames.webContentsMessage + `', {message: message}, callback, '`+ consts.eventNames.ipcEventMessage +`');
+                    astilectron.registerCallback('` + consts.callbackNames.webContentsMessage + `', {message: message}, callback, '` + consts.eventNames.ipcEventMessage + `');
                 },
                 showErrorBox: function(title, content) {
                     dialog.showErrorBox(title, content)
@@ -496,10 +572,10 @@ function windowCreateFinish(json) {
                     dialog.showSaveDialog(null, options, callback)
                 }
             };
-            ipcRenderer.on('`+ consts.eventNames.ipcCmdMessageCallback +`', function(event, message) {
+            ipcRenderer.on('` + consts.eventNames.ipcCmdMessageCallback + `', function(event, message) {
                 astilectron.executeCallback('` + consts.callbackNames.webContentsMessage + `', message, [message.message]);
             });
-            ipcRenderer.on('`+ consts.eventNames.ipcCmdLog+`', function(event, message) {
+            ipcRenderer.on('` + consts.eventNames.ipcCmdLog + `', function(event, message) {
                 console.log(message)
             });
             ` + (typeof json.windowOptions.custom !== "undefined" && typeof json.windowOptions.custom.script !== "undefined" ? json.windowOptions.custom.script : "") + `
@@ -516,14 +592,17 @@ function windowCreateFinish(json) {
     })
     elements[json.targetID].webContents.on('login', (event, request, authInfo, callback) => {
         event.preventDefault();
-        registerCallback(json, consts.callbackNames.webContentsLogin, {authInfo: authInfo, request: request}, consts.eventNames.webContentsEventLogin, callback);
+        registerCallback(json, consts.callbackNames.webContentsLogin, {
+            authInfo: authInfo,
+            request: request
+        }, consts.eventNames.webContentsEventLogin, callback);
     })
     elements[json.targetID].webContents.on('will-navigate', (event, url) => {
         client.write(json.targetID, consts.eventNames.windowEventWillNavigate, {
             url: url
         })
     })
-    if (typeof json.windowOptions.appDetails !== "undefined" && process.platform === "win32"){
+    if (typeof json.windowOptions.appDetails !== "undefined" && process.platform === "win32") {
         elements[json.targetID].setThumbarButtons([]);
         elements[json.targetID].setAppDetails(json.windowOptions.appDetails);
     }
@@ -551,5 +630,7 @@ function executeCallback(k, json, args) {
 
 function sessionCreate(webContents, sessionId) {
     elements[sessionId] = webContents.session
-    elements[sessionId].on('will-download', () => { client.write(sessionId, consts.eventNames.sessionEventWillDownload) })
+    elements[sessionId].on('will-download', () => {
+        client.write(sessionId, consts.eventNames.sessionEventWillDownload)
+    })
 }
