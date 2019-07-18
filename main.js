@@ -294,6 +294,15 @@ app.on('ready', () => {
             case consts.eventNames.windowCmdSetBounds:
                 elements[json.targetID].setBounds(json.bounds, true);
                 break;
+            case consts.eventNames.windowCmdSetResizeble:
+                elements[json.targetID].setResizable(json.resizeble);
+                break;
+            case consts.eventNames.windowCmdSetMinHeight:
+                // elements[json.targetID].
+                break;
+            case consts.eventNames.windowCmdSetMinWidth:
+                // elements[json.targetID].
+                break;
             case consts.eventNames.windowCmdRestore:
                 elements[json.targetID].restore()
                 break;
