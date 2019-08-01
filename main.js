@@ -307,11 +307,11 @@ app.on('ready', () => {
             case consts.eventNames.windowCmdSetResizeble:
                 elements[json.targetID].setResizable(json.resizeble);
                 break;
-            case consts.eventNames.windowCmdSetMinHeight:
-                // elements[json.targetID].
+            case consts.eventNames.windowCmdSetMinWidthHeight:
+                elements[json.targetID].setMinimumSize(json.windowOptions.width, json.windowOptions.height)
                 break;
-            case consts.eventNames.windowCmdSetMinWidth:
-                // elements[json.targetID].
+            case consts.eventNames.windowCmdSetMaxWidthHeight:
+                    elements[json.targetID].setMaximumSize(json.windowOptions.width, json.windowOptions.height)
                 break;
             case consts.eventNames.windowCmdRestore:
                 elements[json.targetID].restore()
