@@ -241,6 +241,16 @@ app.on('ready', () => {
                 elements[json.targetID].setImage(json.image);
                 client.write(json.targetID, consts.eventNames.trayEventImageSet)
                 break;
+            case consts.eventNames.trayEventDisplayBalloon:
+                elements[json.targetID].displayBalloon(json.balloonOption);
+                break
+            case consts.eventNames.trayEventSetTitle:
+                elements[json.targetID].setTitle(json.index);
+                break;
+            case consts.eventNames.trayEventGetTitle:
+                var title = elements[json.targetID].getTitle()
+                client.write(json.targetID, consts.eventNames.trayEventTitleGet, {index: title});
+                break
 
             // Web contents
             case consts.eventNames.webContentsEventLoginCallback:
