@@ -300,6 +300,9 @@ app.on('ready', () => {
             case consts.eventNames.windowCmdSetMinWidthHeight:
                 elements[json.targetID].setMinimumSize(json.windowOptions.width, json.windowOptions.height)
                 break;
+            case consts.eventNames.windowCmdSetMaxWidthHeight:
+                    elements[json.targetID].setMaximumSize(json.windowOptions.width, json.windowOptions.height)
+                break;
             case consts.eventNames.windowCmdRestore:
                 elements[json.targetID].restore()
                 break;

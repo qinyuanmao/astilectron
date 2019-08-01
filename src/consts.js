@@ -90,6 +90,7 @@ module.exports = {
         windowCmdSetBounds: "window.cmd.set.bounds",
         windowCmdSetResizeble: "window.cmd.set.resizeble",
         windowCmdSetMinWidthHeight: "window.cmd.set.minwidthheight",
+        windowCmdSetMaxWidthHeight: "window.cmd.set.maxwidthheight",
         windowCmdRestore: "window.cmd.restore",
         windowCmdShow: "window.cmd.show",
         windowCmdUnmaximize: "window.cmd.unmaximize",
